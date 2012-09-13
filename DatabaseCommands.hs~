@@ -36,10 +36,18 @@ printFields db = do
                     print $ keys (db ! answer)
                  else
                     print "Not a table."
+
               
+--findField    :: Show k => Map String (Map k Field) -> IO () 
+findField db = do
+               putStrLn "What field would you like to search for?"
+               answer <- getLine
+               print $ keys $ Data.Map.filter (\f -> member db f) db
+
 commandList :: Map [Char] (Map String (Map String Field) -> IO ())
 commandList = fromList [  ("halp", (\n -> print $ keys commandList)) --eat the db in order to match the other functions
                             , ("intersection", intersect)
                             , ("printfields", printFields)
                             , ("printtables", (\n -> print $ keys n))
+                            , ("findfield", (findField))
                             , ("exit", (\n -> System.Exit.exitWith ExitSuccess))]
