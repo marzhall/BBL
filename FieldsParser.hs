@@ -12,7 +12,6 @@ data Field = Field {  dataType :: String
                     , format :: String }
     deriving (Show, Eq)
 
-
 getFieldName :: Parser String
 getFieldName = many1 $ alphaNum <|> oneOf "-_#"
 

@@ -7,12 +7,14 @@ import Text.Parsec
 import FieldsParser
 import DatabaseCommands
 
--- for interacting on the command prompt
-getDB = do
-        let filename = "progressDB.txt"
-        handle <- openFile filename ReadMode
-        contents <- hGetContents handle
-        return $ parse tables filename contents
+-- for interacting with the db in ghci
+--getDB = do
+        --let filename = "progressDB.txt"
+        --handle <- openFile filename ReadMode
+        --contents <- hGetContents handle
+        --case parse tables filename contents of
+            --Left err       -> empty
+            --Right database -> database 
 
 main =  do
         let filename = "progressDB.txt"
