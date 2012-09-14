@@ -1,0 +1,13 @@
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\bin\Debug\BBLViewer.exe.config
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\bin\Debug\BBLViewer.exe
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\bin\Debug\BBLViewer.pdb
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.csprojResolveAssemblyReference.cache
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\MainWindow.baml
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\MainWindow.g.cs
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\App.g.cs
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer_MarkupCompile.cache
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.g.resources
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.Properties.Resources.resources
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.csproj.GenerateResource.Cache
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.exe
+C:\Users\marshall\Documents\GitHub\BBL\BBLViewer\BBLViewer\obj\Debug\BBLViewer.pdb
