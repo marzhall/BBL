@@ -29,6 +29,18 @@ printFields printFunc readFunc db = do
                            else
                               printFunc "Not a table."
 
+printFieldInfo printFunc readFunc db = do
+                              printFunc "Which table would you like to see a field's info from?"
+                              answer <- getLine
+                              if (member answer db) then do
+                                 printFunc "Which field would you like to see the info of?"
+                                 fieldToPrint <- getLine
+                                 if (member fieldToPrint (db ! answer)) then 
+                                    printFunc $ show ((db ! answer) ! fieldToPrint)
+                                 else
+                                    printFunc ("Not a field of table " ++ answer)
+                              else
+                                 printFunc "Not a table."
               
 --findField    :: Show k => Map String (Map k Field) -> IO () 
 findField printFunc readFunc db = do
@@ -37,9 +49,10 @@ findField printFunc readFunc db = do
                          mapM_ printFunc $ keys $ Data.Map.filter (\f -> member answer f) db
 
 --commandList :: Map [Char] (Map String (Map String Field) -> IO ())
-commandList printFunc readFunc = fromList [  ("halp", (\_ -> mapM_ printFunc $ keys (commandList printFunc readFunc))) --eat the db in order to match the other functions
+commandList printFunc readFunc = fromList [  ("exit", (\_ -> System.Exit.exitWith ExitSuccess))
+                                           , ("findfield", findField printFunc readFunc)
+                                           , ("halp", (\_ -> mapM_ printFunc $ keys (commandList printFunc readFunc))) --eat the db in order to match the other functions
+                                           , ("info", printFieldInfo printFunc readFunc)
                                            , ("intersection", intersect printFunc readFunc)
                                            , ("printfields", printFields printFunc readFunc)
-                                           , ("printtables", (\database -> mapM_ printFunc $ keys database))
-                                           , ("findfield", findField printFunc readFunc)
-                                           , ("exit", (\_ -> System.Exit.exitWith ExitSuccess))]
+                                           , ("printtables", (\database -> mapM_ printFunc $ keys database))]

@@ -7,7 +7,7 @@ import Text.Parsec
 import FieldsParser
 import DatabaseCommands
 import System.Environment
-import TcpServer
+--import TcpServer
 
 -- for interacting with the db in ghci
 --getDB = do
