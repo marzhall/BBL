@@ -1,58 +1,87 @@
-module DatabaseCommands (commandList) where
-
-import Data.Map
-import System.Exit
+module DatabaseCommands (  commandState 
+                         , commandParser) where 
 import System.IO
-import FieldsParser
+import System.Exit
+import FieldsParsec
+import Data.Map
+import Text.Parsec
+import Text.Parsec.String
+import Text.Parsec.Expr
+import Text.Parsec.Token
+import Text.Parsec.Language
 
---intersect    :: (Ord k, Show k) => Map String (Map k Field) -> IO ()
-intersect printFunc readFunc db = do 
-                         putStrLn "What two tables would you like to see the intersection of?"
-                         printFunc "Table One:"
-                         mapOne <- getLine
-                         if (member mapOne db) then do
-                             printFunc "Table Two:"
-                             mapTwo <- getLine
-                             if (member mapTwo db) then
-                                 mapM_ printFunc (keys (intersection (db ! mapOne) (db ! mapTwo)))
-                             else
-                                 printFunc "The second table does not exist; returning you to main."
+data commandState = {  database :: (Map [Char] (Map String (Map [Char] Field)))
+                     , printFunc :: [Char] -> IO ()
+                     , readFunc :: IO ()}
+
+commandParser                   :: [char] -> commandState -> IO ()
+commandParser command localState = case parse userCommands "command" command of
+                                                        Left error -> (printFunc localState) error
+                                                        Right result -> (printFunc localState) $ foldl commandExecutor (database commandState) result
+
+commandExecutor database
+
+userCommand :: Parser (String, [[Char]])
+userCommand = do
+              command <- many1 alphaNum
+              spaces
+              arguments <- many $ noneOf "\n|"
+              return (command, words arguments)
+
+userCommands :: Parser [(String, [[Char]])]
+userCommands = do
+               list <- many userCommand
+               return list
+                        
+--intersect            :: ([Char] -> IO ()) -> IO String -> Map String (Map [Char] Field) -> IO ())
+intersect localState = do 
+                       putStrLn "What two tables would you like to see the intersection of?"
+                       (printFunc localState) "Table One:"
+                       mapOne <- (readFunc localState)
+                       if (member mapOne db) then do
+                          (printFunc localState) "Table Two:"
+                          mapTwo <- (readFunc localState)
+                          if (member mapTwo db) then
+                               keys $ intersection (db ! mapOne) (db ! mapTwo)
+                          else
+                              (printFunc localState) "The second table does not exist; returning you to main."
+                       else
+                          (printFunc localState) "The first table does not exist; returning you to main."
+
+--printFields            :: commandState -> IO ()) 
+printFields localState = do
+                         (printFunc localState) "Which table would you like to see the fields of?"
+                         answer <- (readFunc localState)
+                         if (member answer db) then 
+                            keys (db ! answer)
                          else
-                             printFunc "The first table does not exist; returning you to main."
+                            (printFunc localState) "Not a table."
 
---printFields    :: Show k => Map String (Map k Field) -> IO () 
-printFields printFunc readFunc db = do
-                           putStrLn "Which table would you like to see the fields of?"
-                           answer <- getLine
-                           if (member answer db) then 
-                              mapM_ printFunc $ keys (db ! answer)
-                           else
-                              printFunc "Not a table."
-
-printFieldInfo printFunc readFunc db = do
-                              printFunc "Which table would you like to see a field's info from?"
-                              answer <- getLine
-                              if (member answer db) then do
-                                 printFunc "Which field would you like to see the info of?"
-                                 fieldToPrint <- getLine
-                                 if (member fieldToPrint (db ! answer)) then 
-                                    printFunc $ show ((db ! answer) ! fieldToPrint)
-                                 else
-                                    printFunc ("Not a field of table " ++ answer)
-                              else
-                                 printFunc "Not a table."
+--printFieldInfo            :: commandState -> IO ()) 
+printFieldInfo localState = do
+                            (printFunc localState) "Which table would you like to see a field's info from?"
+                            answer <- (readFunc localState)
+                            if (member answer db) then do
+                               (printFunc localState) "Which field would you like to see the info of?"
+                               fieldToPrint <- (readFunc localState)
+                               if (member fieldToPrint (db ! answer)) then 
+                                  ((db ! answer) ! fieldToPrint)
+                               else
+                                  (printFunc localState) ("Not a field of table " ++ answer)
+                            else
+                               (printFunc localState) "Not a table."
               
---findField    :: Show k => Map String (Map k Field) -> IO () 
-findField printFunc readFunc db = do
-                         putStrLn "What field would you like to search for?"
-                         answer <- getLine
-                         mapM_ printFunc $ keys $ Data.Map.filter (\f -> member answer f) db
+--findField            :: commandState -> IO ()) 
+findField localState = do
+                       (printFunc localState) "What field would you like to search for?"
+                       answer <- (readFunc localState)
+                       keys $ Data.Map.filter (\f -> member answer f) db
 
---commandList :: Map [Char] (Map String (Map String Field) -> IO ())
-commandList printFunc readFunc = fromList [  ("exit", (\_ -> System.Exit.exitWith ExitSuccess))
-                                           , ("findfield", findField printFunc readFunc)
-                                           , ("halp", (\_ -> mapM_ printFunc $ keys (commandList printFunc readFunc))) --eat the db in order to match the other functions
-                                           , ("info", printFieldInfo printFunc readFunc)
-                                           , ("intersection", intersect printFunc readFunc)
-                                           , ("printfields", printFields printFunc readFunc)
-                                           , ("printtables", (\database -> mapM_ printFunc $ keys database))]
+--commandList            :: ([Char] -> IO ()) -> IO String -> Map [Char] (Map String (Map [Char] Field) -> IO ())
+commandList localState = fromList [  ("exit", (\_ -> System.Exit.exitWith ExitSuccess))
+                                           , ("findfield", findField localState)
+                                           , ("halp", (\_ -> mapM_ (printFunc localState) $ keys (commandList localState))) --eat the db in order to match the other functions
+                                           , ("info", printFieldInfo localState)
+                                           , ("intersection", intersect localState)
+                                           , ("printfields", printFields localState)
+                                           , ("printtables", (\database -> mapM_ (printFunc localState) $ keys database))]
