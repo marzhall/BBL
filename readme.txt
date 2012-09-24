@@ -30,10 +30,11 @@ In Progress:
 Planned:
     - Weak intersections -- e.g., "ship-from" in one table weakly matches
                          -- "ship-to" in another
-    - Databse mapping - create a map of database intersections
+    - Database mapping - create a map of database intersections
 
 USE:
     - Export a "simple" tables file from OpenEdge's DataDictionary, and name
       it "progressDB.txt".
     - To use the main utility, run the "haskellParsingSmall" executable.
-    - To write the databse to c structs for autocomplete, run the 
+    - To write the databse to c structs for autocomplete, run the "CStructDumper"
+      executable with the "progressDB.txt" file in its directory.
