@@ -79,9 +79,9 @@ findField localState = do
 
 --commandList            :: ([Char] -> IO ()) -> IO String -> Map [Char] (Map String (Map [Char] Field) -> IO ())
 commandList localState = fromList [  ("exit", (\_ -> System.Exit.exitWith ExitSuccess))
-                                           , ("findfield", findField localState)
-                                           , ("halp", (\_ -> mapM_ (printFunc localState) $ keys (commandList localState))) --eat the db in order to match the other functions
-                                           , ("info", printFieldInfo localState)
-                                           , ("intersection", intersect localState)
-                                           , ("printfields", printFields localState)
-                                           , ("printtables", (\database -> mapM_ (printFunc localState) $ keys database))]
+                                   , ("findfield", findField localState)
+                                   , ("halp", (\_ -> mapM_ (printFunc localState) $ keys (commandList localState))) --eat the db in order to match the other functions
+                                   , ("info", printFieldInfo localState)
+                                   , ("intersection", intersect localState)
+                                   , ("printfields", printFields localState)
+                                   , ("printtables", (\database -> mapM_ (printFunc localState) $ keys database))]

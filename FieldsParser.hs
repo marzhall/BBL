@@ -1,5 +1,6 @@
 module FieldsParser (  Field
-                     , tables) where
+                     , tables
+                     , dataType) where
 import Text.Parsec
 import Text.Parsec.String
 import Text.Parsec.Expr
