@@ -1,5 +1,6 @@
 module TcpServer(start) where
 
+import Control.Concurrent.Chan
 import Network (listenOn, withSocketsDo, accept, PortID(..), Socket)
 import System.IO (hSetBuffering, hGetLine, hPrint, hPutStrLn, BufferMode(..), Handle)
 import Control.Concurrent (forkIO)
