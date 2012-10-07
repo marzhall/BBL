@@ -22,7 +22,7 @@ sockHandler db sock = do
 
 commandProcessor                 :: Map String (Map [Char] Field) -> Handle -> IO ()
 commandProcessor database handle = do
-     let localCommands = (commandList (hPrint handle) (hGetLine handle))
+     let localCommands = (commandList (hPrintLn handle) (hGetLine handle))
      hPutStrLn handle "What would you like to do? (For help, type \"Halp.\")"
      answer <- hGetLine handle
      case member answer localCommands of
