@@ -12,32 +12,42 @@ wordsWhen p s =  case dropWhile p s of
                       s' -> w : wordsWhen p s''
                             where (w, s'') = break p s'
 
---weakIntersect                            :: ([Char] -> IO ()) -> IO String -> [String] -> Map String (Map [Char] Field) -> IO ()
---weakIntersect printFunc readFunc args db =  if length args /= 2 then do 
-                                               --putStrLn "What two tables would you like to see the intersection of?"
-                                               --printFunc "Table One:"
-                                               --mapOne <- getLine
-                                               --if (member mapOne db) then do
-                                                   --printFunc "Table Two:"
-                                                   --mapTwo <- getLine
-                                                   --if (member mapTwo db) then
-                                                      --mapM_ printFunc (keys (weakIntersection (db ! mapOne) (db ! mapTwo)))
-                                                   --else
-                                                      --printFunc "The second table does not exist; returning you to main."
-                                               --else
-                                                  --printFunc "The first table does not exist; returning you to main."
-                                            --else do
-                                               --if (member (head args) db) then do
-                                                   --if (member (args !! 1) db) then
-                                                      --mapM_ printFunc (weakIntersection (db ! (head args)) (db ! (args !! 1)))
-                                                   --else
-                                                      --printFunc "The second table does not exist; returning you to main."
-                                               --else
-                                                  --printFunc "The first table does not exist; returning you to main."
-                                            --where
-                                                --weakIntersection table1 table2 = do
-                                                                                 --let toMatch = concat (map (wordsWhen (== '-')) (keys table1))
-                                                                                 --mapM_ printFunc $ show $ fromList $ zip toMatch (map (\x -> Prelude.filter (contains x) toMatch) (keys table2))
+weakIntersect                            :: ([Char] -> IO ()) -> IO String -> [String] -> Map String (Map [Char] Field) -> IO ()
+weakIntersect printFunc readFunc args db =  if length args /= 2 then do 
+                                               putStrLn "What two tables would you like to see the intersection of?"
+                                               printFunc "Table One:"
+                                               mapOne <- getLine
+                                               if (member mapOne db) then do
+                                                   printFunc "Table Two:"
+                                                   mapTwo <- getLine
+                                                   if (member mapTwo db) then
+                                                      weakIntersection (db ! mapOne) (db ! mapTwo)
+                                                   else
+                                                      printFunc "The second table does not exist; returning you to main."
+                                               else
+                                                  printFunc "The first table does not exist; returning you to main."
+                                            else do
+                                               if (member (head args) db) then do
+                                                   if (member (args !! 1) db) then
+                                                     weakIntersection (db ! (head args)) (db ! (args !! 1))
+                                                   else
+                                                      printFunc "The second table does not exist; returning you to main."
+                                               else
+                                                  printFunc "The first table does not exist; returning you to main."
+                                            where
+                                                weakIntersection table1 table2 = do
+                                                                                 let toMatch = concat $ map (wordsWhen (== '-')) (keys table1)
+                                                                                 printFunc $ show $ Prelude.filter (\(_,x) -> x /= []) $ zip toMatch (map (\x -> Prelude.filter (contains x) (keys table2)) toMatch)
+
+wFindIn                              :: ([Char] -> IO ()) -> IO String -> [String] -> Map String (Map [Char] Field) -> IO ()
+wFindIn printFunc readFunc args db = if length args == 2 then do 
+                                          let toMatch = wordsWhen (== '-') (args !! 1)
+                                          if (member (head args) db) then do
+                                             putStrLn $ unlines $ head $ map (\x -> Prelude.filter (contains x) (keys (db ! (head args)))) toMatch
+                                          else
+                                             printFunc "That table does not exist; returning you to main."
+                                      else
+                                         printFunc "Format is: weakFind <table> <field>"
 
 intersect                            :: ([Char] -> IO ()) -> IO String -> [String] -> Map String (Map [Char] Field) -> IO ()
 intersect printFunc readFunc args db =  if length args /= 2 then do 
@@ -112,5 +122,7 @@ commandList printFunc readFunc = fromList [  ("exit", (\_ _ -> System.Exit.exitW
                                            , ("halp", (\_ _ -> mapM_ printFunc $ keys (commandList printFunc readFunc)))
                                            , ("info", printFieldInfo printFunc readFunc)
                                            , ("intersect", intersect printFunc readFunc)
+                                           , ("wintersect", weakIntersect printFunc readFunc)
                                            , ("printf", printFields printFunc readFunc)
+                                           , ("weakfind", wFindIn printFunc readFunc)
                                            , ("printt", (\_ database -> mapM_ printFunc $ keys database))]

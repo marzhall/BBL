@@ -26,9 +26,9 @@ main =  do
                              do
                              let localCommands = (commandList print getLine)
                              forever $ do
-                                putStrLn "What would you like to do? (For help, type \"Halp.\")"
+                                putStrLn "What would you like to do? (For help, hit enter or type \"Halp.\")"
                                 answer <- getLine
-                                let commandAndArgs = words answer
+                                let commandAndArgs = if answer /= [] then (words answer) else ["halp"] 
                                 case member (head commandAndArgs) localCommands of
                                    True -> (localCommands ! (head commandAndArgs)) (tail commandAndArgs) database
                                    False -> do 
