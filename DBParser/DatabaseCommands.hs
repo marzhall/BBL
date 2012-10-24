@@ -37,7 +37,8 @@ weakIntersect printFunc readFunc args db =  if length args /= 2 then do
                                             where
                                                 weakIntersection table1 table2 = do
                                                                                  let toMatch = concat $ map (wordsWhen (== '-')) (keys table1)
-                                                                                 printFunc $ show $ Prelude.filter (\(_,x) -> x /= []) $ zip toMatch (map (\x -> Prelude.filter (contains x) (keys table2)) toMatch)
+                                                                                 let matchesOnly (_, x) resultsList = Prelude.filter (\x -> (x /= [])) resultsList
+                                                                                 printFunc $ show $ matchesOnly $ zip toMatch (map (\x -> Prelude.filter (contains x) (keys table2)) toMatch)
 
 wFindIn                              :: ([Char] -> IO ()) -> IO String -> [String] -> Map String (Map [Char] Field) -> IO ()
 wFindIn printFunc readFunc args db = if length args == 2 then do 
