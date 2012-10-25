@@ -1,3 +1,4 @@
+module ProgressParser (includes) where
 import Text.Parsec
 import Text.Parsec.String
 import Text.Parsec.Expr
