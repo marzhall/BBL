@@ -25,7 +25,7 @@ DBParser.cStructDumper:
     - Dump all from a DB file to cStructs in order to use ctags/ vim's
       autocomplete (working, but only for c-conformant names; if you 
       use dashes in your field names/ table names, ctags won't be able
-      to parse it correctly.
+      to parse it correctly).
 
 IncludeFinder:
     - Open the program and type a file name or run the exe with the 
