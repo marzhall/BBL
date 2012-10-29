@@ -30,7 +30,7 @@ DBParser.cStructDumper:
 IncludeFinder:
     - Open the program and type a file name or run the exe with the 
       filename as an argument in order to get a print out of a tree
-      of every file that file includes, written to disk as "file.extenstion.includes"
+      of every file that file includes, written to disk as "file.extension.includes"
 
 #######
 Planned
