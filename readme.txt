@@ -28,9 +28,8 @@ DBParser.cStructDumper:
       to parse it correctly).
 
 IncludeFinder:
-    - Open the program and type a file name or run the exe with the 
-      filename as an argument in order to get a print out of a tree
-      of every file that file includes, written to disk as "file.extension.includes"
+    - Print out a tree of every file that a file includes you specify, 
+      written to disk as "file.extension.includes"
 
 #######
 Planned
