@@ -1,24 +1,24 @@
 import ProgressParser
+import IncludeTree
 import Text.Parsec
 import System.Environment
 import Control.Monad
 import System.IO
-import Data.Tree
 
+parseFile          :: String -> IO (Either ParseError [String])
+parseFile fileName = readFile fileName >>= (\contents -> return $ parse includes contents contents)
 
---Need a custom tree to do this.
---
---parseIncludeTree                :: [String] -> IO [(String, a)]
-parseIncludeTree []             = return []
-parseIncludeTree (current:rest) = do
-        contents <- readFile current
-        case parse includes "" contents of
-            Left err -> do more <- parseIncludeTree rest
-                           return $  [(current, [err])] : more
-            Right results -> 
-                        do more <- parseIncludeTree results
-                           stillmore  <- parseIncludeTree rest
-                           return  $ (current, more) : stillmore
+includeTree          :: String -> IO (IncludeTree (Either ParseError String))
+includeTree fileName = do
+    parsedFile <- parseFile fileName
+    case parsedFile of
+        Left err -> return $ NoIncludes $ Left err
+        Right results -> if results /= [] 
+                            then do
+                                parsedResults <- mapM includeTree results
+                                return $ IncludeFile (Right fileName) parsedResults
+                            else
+                                return $ NoIncludes (Right fileName)
 
 main = do
     args <- getArgs 
@@ -29,17 +29,5 @@ main = do
                 getLine
         else return (args !! 1)
 
-    includeTree <- parseIncludeTree [filename]
-    mapM print $ drawTree includeTree
-
-parseOnFrom res [] = return res
-parseOnFrom res (current:rest) = do
-  contents <- readFile current
-  case parse includes "" contents of
-    Left err       -> parseOnFrom (res ++ [(current, [err])]) rest
-    Right results  -> do more <- parseOnFrom res results
-                         parseOnFrom (res ++ more) rest
-
-
-[(String, [(String, [String])])]
-[(String, [(String, [(String, [String])])])]
+    includeTree <- includeTree filename
+    writeFile (filename ++ ".includes") (printTree includeTree)
