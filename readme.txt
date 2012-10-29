@@ -28,7 +28,7 @@ DBParser.cStructDumper:
       to parse it correctly).
 
 IncludeFinder:
-    - Print out a tree of every file that a file includes you specify, 
+    - Print out a tree of every file that a file you specify includes, 
       written to disk as "file.extension.includes"
 
 #######
