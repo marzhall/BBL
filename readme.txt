@@ -14,11 +14,12 @@
 A group of three tools for Progress (Openedge ABL) Programmers
 
 DBParser.haskellParsingSmall:
- : A Data Dictionary command line app for when you know what you want.
+  A Data Dictionary command line app for when you know what you want.
     - See common field names between two tables (intersect)
     - Search all tables for a field name (find)
     - Get info on a field in a table - its flags, format, etc. (info)
-    - Weakly search a table - "Weakfind <table> 'num'" will find all fields with num in their name
+    - Weakly search a table - "Weakfind <table> 'num'" will find all 
+      fields with num in their name
 
 DBParser.cStructDumper:
     - Dump all from a DB file to cStructs in order to use ctags/ vim's
@@ -31,7 +32,10 @@ IncludeFinder:
       filename as an argument in order to get a print out of a tree
       of every file that file includes, written to disk as "file.extenstion.includes"
 
-Planned:
+#######
+Planned
+#######
+
 DBParser.haskellParsingSmall:
     - Weak intersections -- e.g., "ship-from" in one table weakly matches
                          -- "ship-to" in another
@@ -45,7 +49,9 @@ IncludeFinder:
     - creating a massive map of all includes that can be queried to find out what
       what files include a file X
 
-USE:
+####
+Use
+####
 
 DBParser utilities:
     - Export a "simple" tables file from OpenEdge's DataDictionary, and name
