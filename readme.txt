@@ -44,9 +44,8 @@ DBParser.cStructDumper
     - None
 
 IncludeFinder:
-    - No crashes when the file being included is not present (I know, terrible)
-    - creating a massive map of all includes that can be queried to find out what
-      what files include a file X
+    - creating a forest of includes that can be queried to find out what files 
+      include a file X
 
 ####
 Use
