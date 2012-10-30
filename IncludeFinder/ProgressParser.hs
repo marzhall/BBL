@@ -5,6 +5,16 @@ import Text.Parsec.Expr
 import Text.Parsec.Token
 import Text.Parsec.Language
 
+comment :: Parser String
+comment = do
+    char '/' 
+    char '*'
+    many $ noneOf "*"
+    char '*'
+    char '/'
+    return ""
+
+
 include :: Parser String
 include = do
     char '{'
@@ -28,7 +38,7 @@ preprocessor = do
 
 includes :: Parser [String]
 includes  = do
-    bracedCode <- many $ try preprocessor <|> include <|> junk
+    bracedCode <- many $ try comment <|> try preprocessor <|> include <|> junk
     eof
     return $ populated bracedCode
     where 
