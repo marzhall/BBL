@@ -1,12 +1,15 @@
 import ProgressParser
 import IncludeTree
 import Text.Parsec
+import Text.ParserCombinators.Parsec.Error
+import Text.ParserCombinators.Parsec.Pos
 import System.Environment
 import Control.Monad
 import System.IO
 
 parseFile          :: String -> IO (Either ParseError [String])
-parseFile fileName = readFile fileName >>= (\contents -> return $ parse includes contents contents)
+parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse includes contents contents))
+                           (\_ -> return $ Left $ newErrorMessage (UnExpect ": file cannot be read or found.") (newPos fileName 0 0)) 
 
 includeTree          :: String -> IO (IncludeTree (Either ParseError String))
 includeTree fileName = do
