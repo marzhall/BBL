@@ -7,13 +7,8 @@ import Text.Parsec.Language
 
 comment :: Parser String
 comment = do
-    char '/' 
-    char '*'
-    many $ noneOf "*"
-    char '*'
-    char '/'
+    char '/' >> char '*' >> many (noneOf "*") >> char '*' >> char '/'
     return ""
-
 
 include :: Parser String
 include = do
@@ -25,7 +20,7 @@ include = do
 
 junk :: Parser String
 junk = do
-    many1 $ noneOf "{"
+    many1 $ noneOf "/{"
     return ""
 
 preprocessor :: Parser String
@@ -38,8 +33,8 @@ preprocessor = do
 
 includes :: Parser [String]
 includes  = do
-    bracedCode <- many $ try comment <|> try preprocessor <|> include <|> junk
+    bracedCode <- many $ try comment <|> try preprocessor <|> try include <|> junk
     eof
     return $ populated bracedCode
-    where 
+    where
         populated list = filter (\x -> x /= "") list
