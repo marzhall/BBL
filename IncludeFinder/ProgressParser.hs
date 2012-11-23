@@ -41,30 +41,44 @@ quoted = do
 
 endComment :: Parser String
 endComment = do
-   many $ noneOf "*"
    char '*'
    char '/'
    return ""
 
 randomStar :: Parser String
 randomStar = do
-   many $ noneOf "*"
    char '*'
-   noneOf "/"
+   notFollowedBy $ char '/'
+   return ""
+
+randomSlash :: Parser String
+randomSlash = do
+   char '/'
+   notFollowedBy $ char '*'
+   return ""
+
+commentJunk :: Parser String
+commentJunk = do
+   many1 $ try $ noneOf "*/"
    return ""
 
 comment :: Parser String
 comment = do
         char '/' >> char '*'
-        many $ try randomStar 
+        many $ try commentJunk <|> try comment <|> try randomSlash <|> try randomStar
         endComment
         return ""
+
+includeJunk :: Parser String
+includeJunk = do
+   many1 $ noneOf "{}"
 
 include :: Parser String
 include = do
     char '{'
-    fileName <- many1 $ alphaNum <|> noneOf "\\/?*\"><|&} "
-    many $ noneOf "}"
+    many $ char '"' <|> char '\''
+    fileName <- many1 $ alphaNum <|> noneOf "\\/?*\"'><|&}{ "
+    try $ many $ includeJunk <|> preprocessor 
     char '}'
     return fileName
 
@@ -76,14 +90,15 @@ junk = do
 preprocessor :: Parser String
 preprocessor = do
     char '{'
-    oneOf "&1234567890"
+    lookAhead $ oneOf "{&1234567890"
+    many $ try includeJunk <|> preprocessor
     instructions <- many $ noneOf "}"
     char '}'
     return ""
 
 includes :: Parser [String]
 includes  = do
-    bracedCode <- many $ try junk <|> try comment <|> try quoted <|> try preprocessor <|> try include
+    bracedCode <- many $ try junk <|> try randomStar <|> try randomSlash <|> try comment <|> try quoted <|> try preprocessor <|> try include
     eof
     return $ populated bracedCode
     where
