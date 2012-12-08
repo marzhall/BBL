@@ -1,9 +1,10 @@
 module ProgressParser (includes) where
 import Text.Parsec
-import Text.Parsec.String
+import Text.Parsec.ByteString
 import Text.Parsec.Expr
 import Text.Parsec.Token
 import Text.Parsec.Language
+import qualified Data.ByteString.Char8 as B
 
 escapedDoubleQuote :: Parser String
 escapedDoubleQuote = do

@@ -5,12 +5,13 @@ import System.Directory
 import Text.Parsec
 import Text.ParserCombinators.Parsec.Error
 import Text.ParserCombinators.Parsec.Pos
+import qualified Data.ByteString.Char8 as B
 import System.Environment
 import Control.Monad
 import System.IO
 
 parseFile          :: String -> IO (Either ParseError [String])
-parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse includes contents contents))
+parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse includes fileName (B.pack contents)))
                            (\_ -> return $ Left $ newErrorMessage (UnExpect ": file cannot be read or found.") (newPos fileName 0 0)) 
 
 prettyPrinter          :: [String] -> String
