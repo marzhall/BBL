@@ -1,6 +1,7 @@
 import ProgressParser
-import Data.Map hiding (foldl, filter)
-import Data.List
+import Data.Map as M hiding (foldl, filter)
+import Data.List as D
+import Data.Foldable (foldlM)
 import System.Directory
 import Text.Parsec
 import Text.ParserCombinators.Parsec.Error
@@ -18,18 +19,25 @@ prettyPrinter          :: [String] -> String
 prettyPrinter fileList = foldl (\aggregator file -> (file ++ "\n") ++ aggregator) "" populatedFileList
     where populatedFileList = (filter ((/=) "") fileList)  
 
-dependencyFold                          :: Map String [String] -> String -> String -> IO (Map String [String])
-dependencyFold dependMap child fileName = do
+dependencyFold                                     :: Map String [String] -> Map String [String] -> String -> String -> Map String [String]
+dependencyFold dependMap includeMap child fileName = do
+    if member fileName includeMap then
+        if includes /= [] 
+            then
+                unionsWith (++) (D.map (dependencyFold dbWithNewFile includeMap fileName) includes)
+        else
+            dbWithNewFile
+    else
+        insertWith (++) fileName (("File not found"):(child:(dependMap ! child))) dependMap
+    where includes = (includeMap ! fileName)
+          dbWithNewFile = insertWith (++) fileName (child:(dependMap ! child)) dependMap
+
+includeDB          :: String -> IO (String, [String])
+includeDB fileName = do
     parsedFile <- parseFile fileName
     case parsedFile of
-        Left err -> return $ insertWith (++) fileName ((show err):(child:(dependMap ! child))) dependMap
-        Right results -> if results /= [] 
-                            then do
-                                parents <- mapM (dependencyFold newDB fileName) results
-                                return $ unionsWith (++) parents 
-                            else
-                                return $ newDB
-            where newDB = insertWith (++) fileName (child:(dependMap ! child)) dependMap
+        Left err -> return $ (fileName, [show err])
+        Right results -> return $ (fileName, results)
 
 main = do
     args <- getArgs 
@@ -44,9 +52,10 @@ main = do
                       else return (args !! 1)
 
                   fileList <- getDirectoryContents directory
-                  dependencyFold <- mapM (dependencyFold (fromList [("", [])]) "") fileList
-                  let uniquedMap = Data.Map.map nub $ unionsWith (++) dependencyFold
-                  writeFile "dependencies.cache" (show $ toList $ Data.Map.map nub $ unionsWith (++) dependencyFold)
+                  topLevelIncludes <- foldlM (\includeMap newfile -> (includeDB newfile) >>= (\newInclude -> return $ M.union (fromList [newInclude]) includeMap)) (fromList [("", [""])]) fileList
+                  let dependencyMaps = D.map (dependencyFold (fromList [("", [])]) topLevelIncludes "") fileList
+                  let uniquedMap = M.map nub $ unionsWith (++) dependencyMaps
+                  writeFile "dependencies.cache" (show $ toList $ M.map nub $ unionsWith (++) dependencyMaps)
                   return uniquedMap)
 
     forever $ do
