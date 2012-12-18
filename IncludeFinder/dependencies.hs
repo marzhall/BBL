@@ -9,7 +9,11 @@ import Text.ParserCombinators.Parsec.Pos
 import qualified Data.ByteString.Char8 as B
 import System.Environment
 import Control.Monad
+import Control.Parallel
+import Control.Parallel.Strategies
+import Control.Seq
 import System.IO
+import System.IO.Unsafe (unsafePerformIO) 
 
 parseFile          :: String -> IO (Either ParseError [String])
 parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse includes fileName (B.pack contents)))
@@ -39,6 +43,8 @@ includeDB fileName = do
         Left err -> return $ (fileName, [show err])
         Right results -> return $ (fileName, results)
 
+mapConcurrent f = return. parMap rpar (unsafePerformIO . f)
+
 main = do
     args <- getArgs 
     dependencyDB <- do
@@ -52,8 +58,8 @@ main = do
                       else return (args !! 1)
 
                   fileList <- getDirectoryContents directory
-                  topLevelIncludes <- foldlM (\includeMap newfile -> (includeDB newfile) >>= (\newInclude -> return $ M.union (fromList [newInclude]) includeMap)) (fromList [("", [""])]) fileList
-                  let dependencyMaps = D.map (dependencyFold (fromList [("", [])]) topLevelIncludes "") fileList
+                  topLevelIncludes <-  mapConcurrent includeDB fileList
+                  let dependencyMaps = parMap rpar (dependencyFold (fromList [("", [])]) (fromList topLevelIncludes) "") fileList
                   let uniquedMap = M.map nub $ unionsWith (++) dependencyMaps
                   writeFile "dependencies.cache" (show $ toList $ M.map nub $ unionsWith (++) dependencyMaps)
                   return uniquedMap)
