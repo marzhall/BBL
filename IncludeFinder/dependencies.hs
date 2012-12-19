@@ -21,7 +21,7 @@ parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse i
 
 prettyPrinter          :: [String] -> String
 prettyPrinter fileList = foldl (\aggregator file -> (file ++ "\n") ++ aggregator) "" populatedFileList
-    where populatedFileList = (filter ((/=) "") fileList)  
+    where populatedFileList = filter (endsWith ".p") (filter ((/=) "") fileList)  
 
 dependencyFold                                     :: Map String [String] -> Map String [String] -> String -> String -> Map String [String]
 dependencyFold dependMap includeMap child fileName = do
@@ -45,20 +45,17 @@ includeDB fileName = do
 
 mapConcurrent f = return. parMap rpar (unsafePerformIO . f)
 
+endsWith ending arrayToCheck = foldl (\acc (endSegment, stringSegment) -> acc && (endSegment == stringSegment)) True (zip (reverse ending) (reverse arrayToCheck))
+
+sourced = filter (\file -> endsWith ".p" file || endsWith ".i" file || endsWith ".cls" file)
+
 main = do
     args <- getArgs 
     dependencyDB <- do
         catch (readFile "dependencies.cache" >>= (\contents -> return $ fromList $ read contents))
               (\_ -> do
-                  let askUser = (>=) 1 (length args)
-                  directory <- if askUser 
-                      then do
-                          print "What's the directory, boss?" 
-                          getLine
-                      else return (args !! 1)
-
-                  fileList <- getDirectoryContents directory
-                  topLevelIncludes <-  mapConcurrent includeDB fileList
+                  fileList <- getCurrentDirectory >>= getDirectoryContents
+                  topLevelIncludes <-  mapConcurrent includeDB (sourced fileList)
                   let dependencyMaps = parMap rpar (dependencyFold (fromList [("", [])]) (fromList topLevelIncludes) "") fileList
                   let uniquedMap = M.map nub $ unionsWith (++) dependencyMaps
                   writeFile "dependencies.cache" (show $ toList $ M.map nub $ unionsWith (++) dependencyMaps)
