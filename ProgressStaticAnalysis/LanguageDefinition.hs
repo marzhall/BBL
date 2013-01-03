@@ -9,24 +9,31 @@ openedge = makeTokenParser openedgeDef
 
 {-- Reserved Strings --}
 
-labels = ["do ", "end", "proc", "procedure", "func", "function", "return", "returns", "next", "last"]
+progressLabels = [  "do", "end", "proc", "procedure", "func", "function", "return", "returns"
+          , "next", "last", "undo", "retry", "no-apply", "error", "while"]
 
-definitions = [  "def", "defi", "defin", "define"
-               , "var", "vari", "varia", "variab", "variabl", "variable"
+definitions = [  "var", "vari", "varia", "variab", "variabl", "variable"
                , "input", "input-output", "output", "param", "parameter"
                , "buffer" ]
 
-queryOperators = ["for", "first", "each", "exclusive-lock", "no-lock"]
+queryOperators = [  "for", "find", "first", "each", "exclusive-lock", "no-lock"
+                  , "ge", "gt", "lt", "le", "eq"]
 
-types = [  "int", "inte", "integ", "intege", "integer"
+types = [  "int", "inte", "integ", "intege", "integer" , "decimal" , "int64"
          , "log", "logi", "logic", "logica", "logical"
-         , "date", "time", "datetime"
-         , "char", "chara", "charac", "charact", "characte", "character"]
+         , "date", "time", "datetime" , "datetime-tz"
+         , "char", "chara", "charac", "charact", "characte", "character"
+         , "blob", "clob", "raw", "recid", "field", "like", "as"
+         , "index", "primary", "unique", "temp-table", "table", "no-undo"]
 
-values = ["true", "false", "yes", "no", "now", "today", "etime", "?"]
+values = ["true", "false", "yes", "no", "now", "today", "?"]
 
-logicals = ["if", "else", "then", "GE", "GT", "LT", "LE", "EQ"]
+logicals = ["if", "else", "then", "case", "when"]
 
+internalfunctions = ["can-find", "etime", "lookup", "asc", "chr", "avail", "available"]
+
+operations = [  "ASSIGN", "UPDATE", "RUN", "def", "defi", "defin", "define", "DISP", "DISPLAY"
+              , "MESSAGE"]
 
 
 openedgeDef :: LanguageDef st
@@ -37,9 +44,10 @@ openedgeDef = LanguageDef
            , nestedComments = True
            , identStart     = letter
            , identLetter	= alphaNum <|> oneOf "_#-"
-           , opStart	 = opLetter openedge
-           , opLetter	 = oneOf ":!#$%&*+./<=>?@\\^|-~"
-           , reservedOpNames= []
-           , reservedNames  = labels ++ definitions ++ queryOperators ++ types ++ values ++ logicals
+           , opStart	 = opLetter openedgeDef
+           , opLetter	 = oneOf "!#$%&*+./<=>^|-~"
+           , reservedOpNames = operations
+           , reservedNames  = progressLabels ++ definitions ++ queryOperators ++ types 
+               ++ values ++ logicals ++ internalfunctions
            , caseSensitive  = False
            }
