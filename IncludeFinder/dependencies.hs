@@ -14,6 +14,7 @@ import Control.Parallel.Strategies
 import Control.Seq
 import System.IO
 import System.IO.Unsafe (unsafePerformIO) 
+import System.Exit
 
 parseFile          :: String -> IO (Either ParseError [String])
 parseFile fileName = catch (readFile fileName >>= (\contents -> return $ parse includes fileName (B.pack contents)))
@@ -59,6 +60,7 @@ main = do
                   let dependencyMaps = parMap rpar (dependencyFold (fromList [("", [])]) (fromList topLevelIncludes) "") fileList
                   let uniquedMap = M.map nub $ unionsWith (++) dependencyMaps
                   writeFile "dependencies.cache" (show $ toList $ M.map nub $ unionsWith (++) dependencyMaps)
+                  System.Exit.exitWith $ ExitSuccess
                   return uniquedMap)
 
     forever $ do
